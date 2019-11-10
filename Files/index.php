@@ -16,7 +16,6 @@ $user = new User;
 switch ($_SERVER['PATH_INFO']) {
     case '/login':
       $user->login();
-      //function->__invoke();
       break;
     case '/register':
       $user->register();
@@ -25,6 +24,6 @@ switch ($_SERVER['PATH_INFO']) {
       $user->getUsers();
       break;
     default:
-      // call default route
+      // default to index.php
       break;
 }

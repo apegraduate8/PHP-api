@@ -1,0 +1,30 @@
+<?php
+// WORKS!
+//var_dump(parse_url($_SERVER['REQUEST_URI']));
+//var_dump($_SERVER['PATH_INFO']);
+// $parts = parse_url($_SERVER['REQUEST_URI']);
+
+function my_autoloader($class) {
+    include './' . $class . '.php';
+}
+
+spl_autoload_register('my_autoloader');
+
+$user = new User;
+
+// handle routing
+switch ($_SERVER['PATH_INFO']) {
+    case '/login':
+      $user->login();
+      //function->__invoke();
+      break;
+    case '/register':
+      $user->register();
+      break;
+    case '/getUsers':
+      $user->getUsers();
+      break;
+    default:
+      // call default route
+      break;
+}

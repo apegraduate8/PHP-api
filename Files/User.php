@@ -16,10 +16,13 @@ class User extends Model
     session_start();
   }
 
-  // public function getMysqli() {
-  //    return $this->mysqli;
-  // }
-
+  /**
+   * Validates user inputs
+   * to determine if user can initialize login or registration method
+   *
+   * @param (bool) $register - used to distinguish between login/registeration methoda
+   * @return (bool)
+   */
   public function validate($register = null)
   {
       $email = $_POST['email'];
@@ -34,7 +37,6 @@ class User extends Model
               return false;
           }
 
-          // check if user exists
           $stmt = $this->mysqli->stmt_init();
 
           if (!$stmt->prepare("SELECT id FROM users WHERE email=? AND password=?")) {
@@ -43,8 +45,6 @@ class User extends Model
 
           $stmt->bind_param('ss', $email, $password);
           $stmt->execute();
-
-          /* bind result variables */
           $stmt->store_result();
 
           if($stmt->num_rows > 0) {
@@ -63,13 +63,17 @@ class User extends Model
       }
 
       if (preg_match("/^[a-zA-Z]{3,12}$/", $password)) {
-          // flash error
           return false;
       }
 
       return true;
   }
 
+  /**
+   * Registration action
+   *
+   * @return (object) error | json object
+   */
   public function register()
   {
     if ($_SERVER['REQUEST_METHOD'] != 'POST') {
@@ -115,22 +119,23 @@ class User extends Model
     }
   }
 
+  /**
+   * Login action
+   *
+   * @return (object) error | json object
+   */
   public function login()
   {
     if (!empty($_SESSION['email'])) {
         echo json_encode([$_SESSION]);
     }
 
-    //throw error, request not post method
     if ($_SERVER['REQUEST_METHOD'] != 'POST') {
-      //throw new Exception("Not a post method", 1);
-       echo self::setError('Bad Login', 'method not POST');
+        echo self::setError('Bad Login', 'method not POST');
     }
 
-    // validate request body
     if (!$this->validate()) {
-        // throw error, request not valid
-      echo self::setError('Not Valid', 'The information you entered is not valid. Please check all fields');
+        echo self::setError('Not Valid', 'The information you entered is not valid. Please check all fields');
     }
 
     // begin login
@@ -163,9 +168,14 @@ class User extends Model
     $this->initSession($arr[0]);
   }
 
+  /**
+   * getUsers endpoint
+   * queriess db for all users
+   *
+   * @return (object) error | json object
+   */
   public function getUsers()
   {
-    // throw error, not get method
     if ($_SERVER['REQUEST_METHOD'] != 'GET') {
       echo self::setError('bad request', 'method not GET');
     }
@@ -194,6 +204,11 @@ class User extends Model
     }
   }
 
+  /**
+   * Saves data to user session
+   *
+   * @return (object) - json object
+   */
   public function initSession($data) {
     $_SESSION['user_id'] = $data['user_id'];
     $_SESSION['email'] = $data['email'];
@@ -203,6 +218,11 @@ class User extends Model
     echo json_encode($_SESSION);
   }
 
+  /**
+   * Session data
+   *
+   * @return (object) - session data as object
+   */
   protected function getSession() {
     return [
     $_SESSION['user_id'],
@@ -235,7 +255,7 @@ class User extends Model
 
   }
 
-  // viewMessage function
+  // TODO: viewMessage function
 
   function __destruct()
   {

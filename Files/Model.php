@@ -16,6 +16,11 @@ class Model
     $this->conn = $this->connect();
   }
 
+  /**
+   * Make connection to mysql db
+   *
+   * @return (object) db object
+   */
   protected function connect()
   {
     if (!$this->conn) {
@@ -34,6 +39,13 @@ class Model
     return $this->conn;
   }
 
+  /**
+   * Send json error response
+   *
+   * @param (string) $title - title of message
+   * @param (string) $message - message
+   * @return (object)  json error
+   */
   public function setError($title, $message)
   {
       return json_encode([

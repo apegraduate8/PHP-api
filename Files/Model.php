@@ -49,9 +49,9 @@ class Model
   public function setError($title, $message)
   {
       return json_encode([
-          “error_code” => 101,
-          “error_title” => $title,
-          “error_message” => $message
+          'error_code' => 101,
+          'error_title' => $title,
+          'error_message' => $message
         ]);
   }
 }

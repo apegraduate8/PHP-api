@@ -87,16 +87,16 @@ class User extends Model
     }
 
     // creation of new record
-    $email = $_POST['email'];
-    $password = md5($_POST['password']);
-    $first_name = $_POST['first_name'];
-    $last_name = $_POST['last_name'];
-    $arr = [];
-    $query = "INSERT INTO users (email, password, first_name, last_name) VALUES('$email', '$password', '$first_name', '$last_name')";
-
     if ($this->mysqli->connect_error) {
           die("Connection failed: " . $this->mysqli->connect_error);
     }
+
+    $email = $_POST['email'];
+    $password = password_hash($_POST['password'], PASSWORD_BCRYPT, ['cost' => 12]);
+    $first_name = $_POST['first_name'];
+    $last_name = $_POST['last_name'];
+    $arr = [];
+    $query = "INSERT INTO users (email, password, first_name, last_name) VALUES(?, ?, ?, ?)";
 
     if ($stmt = mysqli_prepare($this->mysqli, $query)) {
         $stmt->bind_param('ssss', $email, $password, $first_name, $last_name);
@@ -140,7 +140,7 @@ class User extends Model
 
     // begin login
     $email = $_POST['email'];
-    $password = md5($_POST['password']);
+    $password = password_hash($_POST['password'], PASSWORD_BCRYPT, ['cost' => 12]);
     $arr = [];
 
     $stmt = $this->mysqli->stmt_init();
@@ -209,7 +209,8 @@ class User extends Model
    *
    * @return (object) - json object
    */
-  public function initSession($data) {
+  public function initSession($data)
+  {
     $_SESSION['user_id'] = $data['user_id'];
     $_SESSION['email'] = $data['email'];
     $_SESSION['first_name'] = $data['first_name'];
@@ -223,7 +224,8 @@ class User extends Model
    *
    * @return (object) - session data as object
    */
-  protected function getSession() {
+  protected function getSession()
+  {
     return [
     $_SESSION['user_id'],
     $_SESSION['email'],
@@ -236,26 +238,70 @@ class User extends Model
   {
       if ($_SERVER['REQUEST_METHOD'] != 'POST') {
           // throw error, not post method
-        echo self::setError('Message Error', 'method not POST');
+          echo self::setError('Message Error', 'method not POST');
+
+          return;
       }
 
       if (empty($_SESSION['email'])) {
           echo self::setError('Session Error', 'must be logged in to send messages');
+
+          return;
       }
 
       $sender = $_POST['sender_user_id'];
-      $reciever = md5($_POST['reciever_user_id']);
+      $recipient = $_POST['receiver_user_id'];
       $message = $_POST['message'];
 
-      if (empty($sender) || empty($sender) || empty($sender)) {
-          echo self::setError('Message Error', 'please check the neccessary fields');
+      if (empty($sender) || empty($recipient) || empty($message)) {
+          echo self::setError('Message Error', 'please check the required fields');
+
+          return;
       }
 
+      if ($this->mysqli->connect_error) {
+          die("Connection failed: " . $this->mysqli->connect_error);
+      }
       // save in DB
 
+      $arr = [];
+      $query = "INSERT INTO messages (sender_user_id, recipient_id, message) VALUES(?, ?, ?)";
+
+      if ($stmt = mysqli_prepare($this->mysqli, $query)) {
+          $stmt->bind_param('sss', $sender, $recipient, $message);
+          $stmt->execute();
+
+          if ($stmt->affected_rows == 1) {
+              $arr[] = [
+                'success_code' => 200,
+                'success_title' => 'Message Sent',
+               'success_message' => 'Message was sent successfully',
+             ];
+          }
+
+          echo json_encode($arr);
+      } else {
+          echo self::setError('SQL error!', 'Message not saved');
+      }
   }
 
-  // TODO: viewMessage function
+  // public function viewMessage()
+  // {
+  //     if ($_SERVER['REQUEST_METHOD'] != 'GET') {
+  //         echo self::setError('bad request', 'method not GET');
+  //     }
+
+  //     if (empty($_SESSION['email'])) {
+  //         echo self::setError('Session Error', 'must be logged in to send messages');
+  //     }
+
+  //     if (empty($user_id_a) || empty($user_id_b)) {
+  //         echo self::setError('Message Request Error', 'please check the required parameters');
+  //     }
+
+  //     // make db call
+
+  // }
 
   function __destruct()
   {

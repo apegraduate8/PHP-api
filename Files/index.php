@@ -23,6 +23,12 @@ switch ($_SERVER['PATH_INFO']) {
     case '/getUsers':
       $user->getUsers();
       break;
+    case '/sendMessage':
+      $user->sendMessage();
+      break;
+    case '/viewMessages':
+      $user->viewMessages();
+      break;
     default:
       // default to index.php
       break;

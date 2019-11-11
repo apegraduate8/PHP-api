@@ -41,3 +41,6 @@ https://www.arclab.com/en/kb/php/php-warning-cannot-modify-header-information-he
 https://en.it1352.com/article/c9c692028f3b49479af4868386ff6308.html
 
 https://community.webfaction.com/questions/14392/no-such-file-or-directory-when-trying-to-connect-to-custom-mysql-instance
+
+datetime
+http://www.mysqltutorial.org/mysql-datetime/

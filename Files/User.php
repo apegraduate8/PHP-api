@@ -30,8 +30,6 @@ class User extends Model
         $password = password_hash($_POST['password'], PASSWORD_BCRYPT, ['cost' => 12]);
         $first_name = $_POST['last_name'];
         $last_name = $_POST['last_name'];
-        $authCheck = empty($email) || empty($password) ? false : true;
-        $nameCheck = empty($last_name) || empty($first_name) ? false : true;
 
         if (!is_null($register)) {
             if (empty($email) || empty($password) || empty($last_name) || empty($first_name)) {
@@ -95,8 +93,8 @@ class User extends Model
         $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
         $first_name = $_POST['first_name'];
         $last_name = $_POST['last_name'];
-        $arr = [];
         $query = "INSERT INTO users (email, password, first_name, last_name) VALUES(?, ?, ?, ?)";
+        $arr = [];
 
         if ($stmt = mysqli_prepare($this->mysqli, $query)) {
             $stmt->bind_param('ssss', $email, $password, $first_name, $last_name);
@@ -281,8 +279,8 @@ class User extends Model
             die("Connection failed: " . $this->mysqli->connect_error);
         }
 
-        $arr = [];
         $query = "INSERT INTO messages (sender_user_id, recipient_id, message) VALUES(?, ?, ?)";
+        $arr = [];
 
         if ($stmt = mysqli_prepare($this->mysqli, $query)) {
             $stmt->bind_param('sss', $sender, $recipient, $message);
@@ -330,8 +328,8 @@ class User extends Model
             die("Connection failed: " . $this->mysqli->connect_error);
         }
 
-        $arr = [];
         $query = "SELECT * FROM `messages` WHERE sender_user_id IN (?,?) AND recipient_id IN (?,?) ORDER BY epoch";
+        $arr = [];
 
         if ($stmt = mysqli_prepare($this->mysqli, $query)) {
             $stmt->bind_param('ssss', $user_id_a, $user_id_b, $user_id_b, $user_id_a);
